@@ -1,17 +1,25 @@
-#include "FF_Trace.h"
-#include <stdarg.h>
+/*
+	This example shows how to implement FF_Trace class the simplest way
+*/
 
-FF_Trace trace;
+#include "FF_Trace.h"
+
+trace_declare();											// Declare trace class
 
 void setup() {
-  Serial.begin(74880);
-  trace.registerCallback(&traceCallback);
-  trace.printf(FF_TRACE_LEVEL_INFO, "Starting trace %d", millis());
-  trace.printf(FF_TRACE_LEVEL_INFO, PSTR("Version %s"), "V1.0.0");
+	Serial.begin(74880);
+	trace_register&traceCallback);							// Register callback
+	trace_info("Starting trace %d", millis());				// Write a trace message
+	trace_info(PSTR("Version %s"), "V1.0.0");				// ... and a second one
 }
 void loop() {
 }
 
-void traceCallback(const traceLevel_t _level, const char* _message) {
-  Serial.println(_message);
+/*
+	Callback routine
+		_level contains severity level
+		_message contains message to display/send
+*/
+trace_callback(traceCallback) {
+	Serial.println(_message);								// Print message on Serial
 }
