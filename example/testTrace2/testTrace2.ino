@@ -20,7 +20,7 @@ void setup() {
   Serial.begin(74880);                                // Set serial speed & init
   trace_register(&mainCallback);                      // Register main callback
   trace_register(&centralTraceCallback);              // Register central trace callback
-  trace_info("Starting trace %d", millis());          // Send a "starting" message
+  trace_info_P("Starting trace %d", millis());        // Send a "starting" message
   myRoutine(12345);                                   // Call myRoutine
   myClass.setString("Hello!");                        // Call myClass
 }
