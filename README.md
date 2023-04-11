@@ -34,6 +34,13 @@ As of now, the following macros are defined:
 
 Note that callback routine won't be called if message severity level if higher than current severity level set.		This class allows to have a centralized place to display trace message on multiple supports.
 
+Callback routines will be called with the following arguments:
+	_level: severity level of message (can be any FF_TRACE_LEVEL_xxxx value)
+	_file: calling source file name with extension
+	_line: calling source file line
+	_function: calling calling source function name
+	_message: text message to send
+
 ## Prerequisites
 
 Can be used directly with Arduino IDE or PlatformIO.

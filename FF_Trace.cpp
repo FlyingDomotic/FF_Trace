@@ -42,11 +42,14 @@ void FF_Trace::registerCallback(const traceCallback_t _callback) {
 	Send a message to all registered routines
 
 	/param	_level: level associated to this message
+	/param	_file: calling source file name with extension
+	/param	_line: calling source file line
+	/param	_function: calling calling source function name
 	/param	_format: (printf) format string to use
 	/param	...: associated parameters (depends on format string contents)
 
 */
-void FF_Trace::printf(const traceLevel_t _level, const char* _format, ...) {
+void FF_Trace::printf(const traceLevel_t _level, const char* _file, const uint16_t _line, const char* _function, const char* _format, ...) {
 	// Check level against internal one
 	if (_level <= currentLevel) {
 		// Make the message
@@ -58,7 +61,7 @@ void FF_Trace::printf(const traceLevel_t _level, const char* _format, ...) {
 		// Call all registered callbacks
 		for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
 			if (callbacks[i] != NULL) {
-				(callbacks[i])(_level, msg);
+				(callbacks[i])(_level, _file, _line, _function, msg);
 			}
 		}
 	}
