@@ -39,7 +39,12 @@ void FF_Trace::registerCallback(const traceCallback_t _callback) {
 }
 
 /*!
-	Send a message to all registered routines
+	Send a message to all registered routines using printf format
+
+	A first try is done with a 200 bytes buffer.
+	If too short, a sufficiently long one is dynamically allocated.
+	IF dynamic allocation fails, only the first 200 bytes of message are displayed.
+	Else, full message is shown.
 
 	/param	_level: level associated to this message
 	/param	_file: calling source file name with extension
@@ -53,15 +58,41 @@ void FF_Trace::printf(const traceLevel_t _level, const char* _file, const uint16
 	// Check level against internal one
 	if (_level <= currentLevel) {
 		// Make the message
-		char msg[100];
+		char msg[200];										// Allocate 200 bytes for message (larger buffer allocated dynamically if needed)
 		va_list arguments;
 		va_start(arguments, _format);
-		vsnprintf(msg, sizeof(msg), _format, arguments);
+		int size = vsnprintf(msg, sizeof(msg), _format, arguments);
 		va_end(arguments);
-		// Call all registered callbacks
-		for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
-			if (callbacks[i] != NULL) {
-				(callbacks[i])(_level, _file, _line, _function, msg);
+		// Was buffer large enough?
+		if (size < (int) sizeof(msg)) {
+			// Call all registered callbacks
+			for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
+				if (callbacks[i] != NULL) {
+					(callbacks[i])(_level, _file, _line, _function, msg);
+				}
+			}
+		} else {
+			// Use dynamic buffer allocation
+			char* buffer = (char *) malloc(size+1);
+			if (!buffer) {
+				// Not enougth memory, call all registered callbacks with fixed string
+				for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
+					if (callbacks[i] != NULL) {
+						(callbacks[i])(_level, _file, _line, _function, msg);
+					}
+				}
+			} else {
+				va_list arguments;
+				va_start(arguments, _format);
+				vsnprintf(buffer, size, _format, arguments);
+				va_end(arguments);
+				// Call all registered callbacks with dynamic string
+				for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
+					if (callbacks[i] != NULL) {
+						(callbacks[i])(_level, _file, _line, _function, buffer);
+					}
+				}
+				free(buffer);
 			}
 		}
 	}
