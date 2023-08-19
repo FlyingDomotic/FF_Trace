@@ -73,3 +73,12 @@ or
 ```
 git checkout <modified file>
 ```
+
+## Documentation
+
+Documentation could be built using doxygen, either using makedoc.sh (for Linux) or makedoc.bat (for Windows), or running
+```
+doxygen doxyfile
+```
+
+HTML and RTF versions will then be available in `documentation` folder.
