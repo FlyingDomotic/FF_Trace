@@ -141,32 +141,32 @@
 		\param	format: printf format message
 		\param	parameters: message parameters (depends on message format)
 	*/
-	#define trace_error(...) FF_TRACE.printf(FF_TRACE_LEVEL_ERROR, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
-	#define trace_error_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_ERROR, __FILE__, __LINE__, __func__, PSTR(fmt), ##__VA_ARGS__)
+	#define trace_error(...) FF_TRACE.printf(FF_TRACE_LEVEL_ERROR, __FILE__, __LINE__, __func__, __VA_ARGS__)
+	#define trace_error_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_ERROR, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
 
 	/*!
 		Sends a warning message
 		\param	format: printf format message
 		\param	parameters: message parameters (depends on message format)
 	*/
-	#define trace_warn(...) FF_TRACE.printf(FF_TRACE_LEVEL_WARN, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
-	#define trace_warn_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_WARN, __FILE__, __LINE__, __func__, PSTR(fmt), ##__VA_ARGS__)
+	#define trace_warn(...) FF_TRACE.printf(FF_TRACE_LEVEL_WARN, __FILE__, __LINE__, __func__, __VA_ARGS__)
+	#define trace_warn_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_WARN, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
 
 	/*!
 		Sends an information message
 		\param	format: printf format message
 		\param	parameters: message parameters (depends on message format)
 	*/
-	#define trace_info(...) FF_TRACE.printf(FF_TRACE_LEVEL_INFO, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
-	#define trace_info_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_INFO, __FILE__, __LINE__, __func__, PSTR(fmt), ##__VA_ARGS__)
+	#define trace_info(...) FF_TRACE.printf(FF_TRACE_LEVEL_INFO, __FILE__, __LINE__, __func__, __VA_ARGS__)
+	#define trace_info_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_INFO, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
 
 	/*!
 		Sends a debug message
 		\param	format: printf format message
 		\param	parameters: message parameters (depends on message format)
 	*/
-	#define trace_debug(...) FF_TRACE.printf(FF_TRACE_LEVEL_DEBUG, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
-	#define trace_debug_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_DEBUG, __FILE__, __LINE__, __func__, PSTR(fmt), ##__VA_ARGS__)
+	#define trace_debug(...) FF_TRACE.printf(FF_TRACE_LEVEL_DEBUG, __FILE__, __LINE__, __func__, __VA_ARGS__)
+	#define trace_debug_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_DEBUG, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
 
 	/*!
 		Sends a verbose message
@@ -174,8 +174,8 @@
 		\param	parameters: message parameters (depends on message format)
 	*/
 
-	#define trace_verbose(...) FF_TRACE.printf(FF_TRACE_LEVEL_VERBOSE, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
-	#define trace_verbose_P(...) FF_TRACE.printf(FF_TRACE_LEVEL_VERBOSE, __FILE__, __LINE__, __func__, PSTR(fmt), ##__VA_ARGS__)
+	#define trace_verbose(...) FF_TRACE.printf(FF_TRACE_LEVEL_VERBOSE, __FILE__, __LINE__, __func__, __VA_ARGS__)
+	#define trace_verbose_P(...) FF_TRACE.printf(FF_TRACE_LEVEL_VERBOSE, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
 
 	/*!
 		Declare class as external
