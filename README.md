@@ -32,7 +32,7 @@ As of now, the following macros are defined:
 	trace_debug(format, parameters...): print/send a debug message (with printf syntax), using format and paramaters
 	trace_verbose(format, parameters...): print/send a verbose message (with printf syntax), using format and paramaters
 
-Note that callback routine won't be called if message severity level if higher than current severity level set.		This class allows to have a centralized place to display trace message on multiple supports.
+Note that callback routine won't be called if message severity level if higher than current severity level set.
 
 Callback routines will be called with the following arguments:
 	_level: severity level of message (can be any FF_TRACE_LEVEL_xxxx value)
