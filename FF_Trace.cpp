@@ -54,7 +54,11 @@ void FF_Trace::registerCallback(const traceCallback_t _callback) {
 	/param	...: associated parameters (depends on format string contents)
 
 */
+#ifndef FF_TRACE_NO_SOURCE_INFO
 void FF_Trace::printf(const traceLevel_t _level, const char* _file, const uint16_t _line, const char* _function, const char* _format, ...) {
+#else
+void FF_Trace::printf(const traceLevel_t _level, const char* _format, ...) {
+#endif
 	// Check level against internal one
 	if (_level <= currentLevel) {
 		// Make the message
@@ -68,7 +72,11 @@ void FF_Trace::printf(const traceLevel_t _level, const char* _file, const uint16
 			// Call all registered callbacks
 			for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
 				if (callbacks[i] != NULL) {
-					(callbacks[i])(_level, _file, _line, _function, msg);
+					#ifndef FF_TRACE_NO_SOURCE_INFO
+						(callbacks[i])(_level, _file, _line, _function, msg);
+					#else
+						(callbacks[i])(_level, msg);
+					#endif
 				}
 			}
 		} else {
@@ -78,7 +86,11 @@ void FF_Trace::printf(const traceLevel_t _level, const char* _file, const uint16
 				// Not enougth memory, call all registered callbacks with fixed string
 				for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
 					if (callbacks[i] != NULL) {
-						(callbacks[i])(_level, _file, _line, _function, msg);
+						#ifndef FF_TRACE_NO_SOURCE_INFO
+							(callbacks[i])(_level, _file, _line, _function, msg);
+						#else
+							(callbacks[i])(_level, msg);
+						#endif
 					}
 				}
 			} else {
@@ -89,7 +101,11 @@ void FF_Trace::printf(const traceLevel_t _level, const char* _file, const uint16
 				// Call all registered callbacks with dynamic string
 				for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
 					if (callbacks[i] != NULL) {
-						(callbacks[i])(_level, _file, _line, _function, buffer);
+						#ifndef FF_TRACE_NO_SOURCE_INFO
+							(callbacks[i])(_level, _file, _line, _function, buffer);
+						#else
+							(callbacks[i])(_level, buffer);
+						#endif
 					}
 				}
 				free(buffer);
@@ -121,3 +137,11 @@ traceLevel_t FF_Trace::getLevel(void) {
 	// Return internal level
 	return currentLevel;
 }
+
+char * FF_Trace::textLevel(level) {
+	if (level >= FF_TRACE_LEVEL_NONE && level <= FF_TRACE_LEVEL_VERBOSE) {
+		return levelName[currentLevel];
+	}
+	return (char *) "????"
+}
+

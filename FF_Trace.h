@@ -11,13 +11,15 @@
 	#include "Arduino.h"
 
 	// Maximum number of callback routines
-	#define FF_TRACE_MAX_TRACE 5
+	#ifndef FF_TRACE_MAX_TRACE
+		#define FF_TRACE_MAX_TRACE 5
+	#endif
 
 	/*!
 		Define supported levels
 	*/
 	typedef enum {
-		FF_TRACE_LEVEL_NONE,		//!< No trace output
+		FF_TRACE_LEVEL_NONE = 0,	//!< No trace output
 		FF_TRACE_LEVEL_ERROR,		//!< Critical errors (usually aborting current action)
 		FF_TRACE_LEVEL_WARN,		//!< Warning messages (usually not aborting)
 		FF_TRACE_LEVEL_INFO,		//!< Information messages
@@ -31,8 +33,11 @@
 		\param _message: message to send/display
 	*/
 
-	typedef void (traceCallback_t)(const traceLevel_t _level, const char* _file, const uint16_t _line, const char* _function, const char* _message);
-
+	#ifndef FF_TRACE_NO_SOURCE_INFO
+		typedef void (traceCallback_t)(const traceLevel_t _level, const char* _file, const uint16_t _line, const char* _function, const char* _message);
+	#else
+		typedef void (traceCallback_t)(const traceLevel_t _level, const char* _message);
+	#endif
 	#ifdef __cplusplus
 	/*!	\class FF_Trace
 		\brief Implements a centralized trace class
@@ -82,12 +87,24 @@
 		public:
 			FF_Trace();
 			void registerCallback(const traceCallback_t _callback);
-			void printf(const traceLevel_t _level, const char* _file, const uint16_t _line, const char* _function, const char* _format, ...);
+			#ifndef FF_TRACE_NO_SOURCE_INFO
+				void printf(const traceLevel_t _level, const char* _file, const uint16_t _line, const char* _function, const char* _format, ...);
+			#else
+				void printf(const traceLevel_t _level, const char* _format, ...);
+			#endif
 			void setLevel(const traceLevel_t _level);
 			traceLevel_t getLevel(void);
 		private:
 			traceCallback_t *callbacks[FF_TRACE_MAX_TRACE];
 			traceLevel_t currentLevel;
+			char * levelName[6] = 
+			{{(char *) "None"},
+			{{(char *) "Error"},
+			{{(char *) "Warning"},
+			{{(char *) "Info"},
+			{{(char *) "Debug"},
+			{{(char *) "Verbose}
+			
 	};
 	#endif
 
@@ -122,7 +139,106 @@
 			const char* _message: message to be sent/displayed
 
 	*/
-	#define trace_callback(callback) void callback(const traceLevel_t _level, const char* _file, const uint16_t _line, const char* _function, const char* _message)
+
+	#ifndef FF_TRACE_NO_SOURCE_INFO
+		#define trace_callback(callback) void callback(const traceLevel_t _level, const char* _file, const uint16_t _line, const char* _function, const char* _message)
+
+		/*!
+			Sends an error message
+			\param	format: printf format message
+			\param	parameters: message parameters (depends on message format)
+		*/
+		#define trace_error(...) FF_TRACE.printf(FF_TRACE_LEVEL_ERROR, __FILE__, __LINE__, __func__, __VA_ARGS__)
+		#define trace_error_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_ERROR, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
+
+		/*!
+			Sends a warning message
+			\param	format: printf format message
+			\param	parameters: message parameters (depends on message format)
+		*/
+		#define trace_warn(...) FF_TRACE.printf(FF_TRACE_LEVEL_WARN, __FILE__, __LINE__, __func__, __VA_ARGS__)
+		#define trace_warn_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_WARN, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
+
+		/*!
+			Sends an information message
+			\param	format: printf format message
+			\param	parameters: message parameters (depends on message format)
+		*/
+		#define trace_info(...) FF_TRACE.printf(FF_TRACE_LEVEL_INFO, __FILE__, __LINE__, __func__, __VA_ARGS__)
+		#define trace_info_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_INFO, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
+
+		/*!
+			Sends a debug message
+			\param	format: printf format message
+			\param	parameters: message parameters (depends on message format)
+		*/
+		#define trace_debug(...) FF_TRACE.printf(FF_TRACE_LEVEL_DEBUG, __FILE__, __LINE__, __func__, __VA_ARGS__)
+		#define trace_debug_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_DEBUG, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
+
+		/*!
+			Sends a verbose message
+			\param	format: printf format message
+			\param	parameters: message parameters (depends on message format)
+		*/
+
+		#define trace_verbose(...) FF_TRACE.printf(FF_TRACE_LEVEL_VERBOSE, __FILE__, __LINE__, __func__, __VA_ARGS__)
+		#define trace_verbose_P(...) FF_TRACE.printf(FF_TRACE_LEVEL_VERBOSE, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
+	#else
+		#define trace_callback(callback) void callback(const traceLevel_t _level, const char* _message)
+
+		/*!
+			Set minimum severity level of messages to be sent/printed
+			\param	level: Can be FF_TRACE_LEVEL_NONE/ERROR/WARD/INFO/DEBUG/VERBOSE
+		*/
+		#define trace_setLevel(level) FF_TRACE.setLevel(level)
+
+		/*!
+			Return minimum severity level of messages to be sent/printed
+			\return	minimum level: Can be FF_TRACE_LEVEL_NONE/ERROR/WARD/INFO/DEBUG/VERBOSE
+		*/
+		#define trace_getLevel() FF_TRACE.getLevel()
+
+		/*!
+			Sends an error message
+			\param	format: printf format message
+			\param	parameters: message parameters (depends on message format)
+		*/
+		#define trace_error(...) FF_TRACE.printf(FF_TRACE_LEVEL_ERROR, __VA_ARGS__)
+		#define trace_error_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_ERROR, PSTR(fmt), __VA_ARGS__)
+
+		/*!
+			Sends a warning message
+			\param	format: printf format message
+			\param	parameters: message parameters (depends on message format)
+		*/
+		#define trace_warn(...) FF_TRACE.printf(FF_TRACE_LEVEL_WARN, __VA_ARGS__)
+		#define trace_warn_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_WARN, PSTR(fmt), __VA_ARGS__)
+
+		/*!
+			Sends an information message
+			\param	format: printf format message
+			\param	parameters: message parameters (depends on message format)
+		*/
+		#define trace_info(...) FF_TRACE.printf(FF_TRACE_LEVEL_INFO, __VA_ARGS__)
+		#define trace_info_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_INFO, PSTR(fmt), __VA_ARGS__)
+
+		/*!
+			Sends a debug message
+			\param	format: printf format message
+			\param	parameters: message parameters (depends on message format)
+		*/
+		#define trace_debug(...) FF_TRACE.printf(FF_TRACE_LEVEL_DEBUG, __VA_ARGS__)
+		#define trace_debug_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_DEBUG, PSTR(fmt), __VA_ARGS__)
+
+		/*!
+			Sends a verbose message
+			\param	format: printf format message
+			\param	parameters: message parameters (depends on message format)
+		*/
+
+		#define trace_verbose(...) FF_TRACE.printf(FF_TRACE_LEVEL_VERBOSE, __VA_ARGS__)
+		#define trace_verbose_P(...) FF_TRACE.printf(FF_TRACE_LEVEL_VERBOSE, PSTR(fmt), __VA_ARGS__)
+	#endif
 
 	/*!
 		Set minimum severity level of messages to be sent/printed
@@ -137,45 +253,11 @@
 	#define trace_getLevel() FF_TRACE.getLevel()
 
 	/*!
-		Sends an error message
-		\param	format: printf format message
-		\param	parameters: message parameters (depends on message format)
+		Return text of given severity level
+		\return	clear name of a seveviry level
 	*/
-	#define trace_error(...) FF_TRACE.printf(FF_TRACE_LEVEL_ERROR, __FILE__, __LINE__, __func__, __VA_ARGS__)
-	#define trace_error_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_ERROR, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
+	#define trace_textLevel(level) FF_TRACE.getLevel(level)
 
-	/*!
-		Sends a warning message
-		\param	format: printf format message
-		\param	parameters: message parameters (depends on message format)
-	*/
-	#define trace_warn(...) FF_TRACE.printf(FF_TRACE_LEVEL_WARN, __FILE__, __LINE__, __func__, __VA_ARGS__)
-	#define trace_warn_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_WARN, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
-
-	/*!
-		Sends an information message
-		\param	format: printf format message
-		\param	parameters: message parameters (depends on message format)
-	*/
-	#define trace_info(...) FF_TRACE.printf(FF_TRACE_LEVEL_INFO, __FILE__, __LINE__, __func__, __VA_ARGS__)
-	#define trace_info_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_INFO, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
-
-	/*!
-		Sends a debug message
-		\param	format: printf format message
-		\param	parameters: message parameters (depends on message format)
-	*/
-	#define trace_debug(...) FF_TRACE.printf(FF_TRACE_LEVEL_DEBUG, __FILE__, __LINE__, __func__, __VA_ARGS__)
-	#define trace_debug_P(fmt, ...) FF_TRACE.printf(FF_TRACE_LEVEL_DEBUG, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
-
-	/*!
-		Sends a verbose message
-		\param	format: printf format message
-		\param	parameters: message parameters (depends on message format)
-	*/
-
-	#define trace_verbose(...) FF_TRACE.printf(FF_TRACE_LEVEL_VERBOSE, __FILE__, __LINE__, __func__, __VA_ARGS__)
-	#define trace_verbose_P(...) FF_TRACE.printf(FF_TRACE_LEVEL_VERBOSE, __FILE__, __LINE__, __func__, PSTR(fmt), __VA_ARGS__)
 
 	/*!
 		Declare class as external
