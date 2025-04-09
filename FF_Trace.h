@@ -94,16 +94,18 @@
 			#endif
 			void setLevel(const traceLevel_t _level);
 			traceLevel_t getLevel(void);
+            char * textLevel(traceLevel_t _level);
 		private:
 			traceCallback_t *callbacks[FF_TRACE_MAX_TRACE];
 			traceLevel_t currentLevel;
-			char * levelName[6] = 
-			{{(char *) "None"},
-			{{(char *) "Error"},
-			{{(char *) "Warning"},
-			{{(char *) "Info"},
-			{{(char *) "Debug"},
-			{{(char *) "Verbose}
+            char * levelName[6] = {
+                (char *) "None",
+                (char *) "Error",
+                (char *) "Warning",
+                (char *) "Info",
+                (char *) "Debug",
+                (char *) "Verbose"
+            };
 			
 	};
 	#endif

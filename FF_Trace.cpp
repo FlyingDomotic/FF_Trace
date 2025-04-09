@@ -138,10 +138,10 @@ traceLevel_t FF_Trace::getLevel(void) {
 	return currentLevel;
 }
 
-char * FF_Trace::textLevel(level) {
-	if (level >= FF_TRACE_LEVEL_NONE && level <= FF_TRACE_LEVEL_VERBOSE) {
-		return levelName[currentLevel];
+char * FF_Trace::textLevel(traceLevel_t _level) {
+    static char unknownValue[] = "????";
+    if (_level >= FF_TRACE_LEVEL_NONE && _level <= FF_TRACE_LEVEL_VERBOSE) {
+        return levelName[_level];
 	}
-	return (char *) "????"
+    return unknownValue;
 }
-
