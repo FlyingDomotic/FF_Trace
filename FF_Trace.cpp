@@ -80,36 +80,22 @@ void FF_Trace::printf(const traceLevel_t _level, const char* _format, ...) {
 				}
 			}
 		} else {
-			// Use dynamic buffer allocation
-			char* buffer = (char *) malloc(size+1);
-			if (!buffer) {
-				// Not enougth memory, call all registered callbacks with fixed string
-				for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
-					if (callbacks[i] != NULL) {
-						#ifndef FF_TRACE_NO_SOURCE_INFO
-							(callbacks[i])(_level, _file, _line, _function, msg);
-						#else
-							(callbacks[i])(_level, msg);
-						#endif
-					}
-				}
-			} else {
-				va_list arguments;
-				va_start(arguments, _format);
-				vsnprintf(buffer, size, _format, arguments);
-				va_end(arguments);
-				// Call all registered callbacks with dynamic string
-				for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
-					if (callbacks[i] != NULL) {
-						#ifndef FF_TRACE_NO_SOURCE_INFO
-							(callbacks[i])(_level, _file, _line, _function, buffer);
-						#else
-							(callbacks[i])(_level, buffer);
-						#endif
-					}
-				}
-				free(buffer);
-			}
+			// Use dynamic buffer allocation (on stack)
+			char buffer[size+1];
+            va_list arguments;
+            va_start(arguments, _format);
+            vsnprintf(buffer, size, _format, arguments);
+            va_end(arguments);
+            // Call all registered callbacks with dynamic string
+            for (uint8_t i = 0; i < FF_TRACE_MAX_TRACE; i++) {
+                if (callbacks[i] != NULL) {
+                    #ifndef FF_TRACE_NO_SOURCE_INFO
+                        (callbacks[i])(_level, _file, _line, _function, buffer);
+                    #else
+                        (callbacks[i])(_level, buffer);
+                    #endif
+                }
+            }
 		}
 	}
 }
